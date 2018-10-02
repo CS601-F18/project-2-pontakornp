@@ -45,6 +45,7 @@ public class AmazonFileOperations {
 			while((line = reader.readLine()) != null) {
 				try {
 					Review review = gson.fromJson(line, Review.class); // parse json to Review object
+					
 				} catch(JsonSyntaxException jse) {
 					// skip
 				}

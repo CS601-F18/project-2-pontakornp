@@ -28,7 +28,10 @@ public class Review{
 		this.unixReviewTime = unixReviewTime;
 	}
 	
-//	public String toString() {
-//		return "Unix Review Time: " + unixReviewTime + "\n";
-//	}
+	public String toString() {
+		return "Reviewer ID: " + reviewerID + "\n"
+				+ "ASIN: " + asin + "\n"
+				+ "Review text: " + reviewText + "\n"
+				+ "Overall score: " + overall + "\n";
+	}
 }
