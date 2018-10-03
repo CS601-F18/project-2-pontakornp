@@ -29,42 +29,29 @@ public class ReviewPublisher implements Runnable{
 	public void run() {
 		//call blocker publish
 		while(running) {
-			synchronized(this) {
-				//check if msg to be publisher, if not keep blocking until the checker been notify
-				Charset cs = Charset.forName("ISO-8859-1");
-				Path path = Paths.get(fileName);
-				try(
-					BufferedReader reader = Files.newBufferedReader(path, cs);
-				) {
-					String line;
-					Gson gson = new Gson();
-					while((line = reader.readLine()) != null) {
-						try {
-							Review review = gson.fromJson(line, Review.class); // parse json to Review object
-							
-	//						synchronized(this) {
-								broker.publish(review);
-	//						}
-							
-						} catch(JsonSyntaxException jse) {
-							// skip
-						}
+			//check if msg to be publisher, if not keep blocking until the checker been notify
+			Charset cs = Charset.forName("ISO-8859-1");
+			Path path = Paths.get(fileName);
+			try(
+				BufferedReader reader = Files.newBufferedReader(path, cs);
+			) {
+				String line;
+				Gson gson = new Gson();
+				while((line = reader.readLine()) != null) {
+					try {
+						Review review = gson.fromJson(line, Review.class); // parse json to Review object
+						broker.publish(review);
+					} catch(JsonSyntaxException jse) {
+						// skip
 					}
 				}
-				catch(IOException ioe) {
-					System.out.println("Please try again with correct input.");
-				}
+			}
+			catch(IOException ioe) {
+				System.out.println("Please try again with correct input.");
 			}
 			//if broker is shutdown
 			// publisher = false;
 			running = false;
 		}
 	}
-	
-	public void stop() {
-		running = false;
-	}
-	
-	
-
 }

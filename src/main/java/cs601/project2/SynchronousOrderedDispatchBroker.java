@@ -8,7 +8,7 @@ public class SynchronousOrderedDispatchBroker implements Broker<Review> {
 //	public SynchronousOrderedDispatchBroker() {
 //		subscriberList 
 //	}
-	public void publish(Review review) {
+	public synchronized void publish(Review review) {
 		System.out.println(++count); // temporary use
 		for(Subscriber<Review> subscriber: subscriberList) {
 			subscriber.onEvent(review);
