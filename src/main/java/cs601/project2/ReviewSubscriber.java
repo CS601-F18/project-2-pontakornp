@@ -18,8 +18,10 @@ public class ReviewSubscriber implements Subscriber<Review> {
 	public void onEvent(Review review) {
 		if(review.getUnixReviewTime() <= 1362268800) {
 			writeFile(review, "old");
+//			System.out.println(review);
 		} else {
 			writeFile(review, "new");
+//			System.out.println(review);
 		}
 	}
 
@@ -40,11 +42,11 @@ public class ReviewSubscriber implements Subscriber<Review> {
 			try {
 				String reviewRecord = gson.toJson(review); // parse json to Review object
 				if(type == "old") {
-					System.out.println(reviewRecord);
+//					System.out.println(reviewRecord);
 					writer1.append(reviewRecord);
 					writer1.newLine();
 				}else if(type == "new") {
-					System.out.println(reviewRecord);
+//					System.out.println(reviewRecord);
 					writer2.append(reviewRecord);
 					writer2.newLine();
 				}

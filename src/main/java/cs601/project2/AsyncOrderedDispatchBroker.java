@@ -3,38 +3,50 @@ package cs601.project2;
 import java.util.ArrayList;
 
 public class AsyncOrderedDispatchBroker implements Broker<Review>, Runnable{
-	private ReviewBlockingQueue blockingQueue = new ReviewBlockingQueue(32);
-	private ArrayList<Subscriber<Review>> subscriberList = new ArrayList<Subscriber<Review>>();
-	private boolean running = true;
-	private String dummy = "";
+	private ReviewBlockingQueue blockingQueue;
+	private ArrayList<Subscriber<Review>> subscriberList;
+	private boolean running;
 	
+	public AsyncOrderedDispatchBroker() {
+		blockingQueue = new ReviewBlockingQueue(32);
+		subscriberList = new ArrayList<Subscriber<Review>>();
+		running = true;
+	}
 	public void publish(Review review) {
 		blockingQueue.put(review);
-		dummy.notify(); //notify taker that review is added
+		synchronized(subscriberList) {
+			subscriberList.notify();
+		}
 	}
 	
 	public void subscribe(Subscriber<Review> subscriber) {
-		this.subscriberList.add(subscriber);
+		subscriberList.add(subscriber);
 	}
 	
 	public void shutdown() {
+		while(!blockingQueue.isEmpty()) {
+			running = true;
+		}
 		running = false;
 	}
 	
 	public void run() {
 		while(running) {
 			if(blockingQueue.isEmpty()) {
-				try {
-					dummy.wait();
-				} catch (InterruptedException e) {
-//					e.printStackTrace();
-					System.out.println("what happen");
-				} catch (Exception e) {
-					System.out.println("whawoaw;efja");
+				synchronized(subscriberList) {
+					try {
+						subscriberList.wait();
+					} catch (InterruptedException e) {
+						System.out.println("Please try again.");
+					} catch (Exception e) {
+						System.out.println("for checking");
+					}
 				}
-			}
-			for(Subscriber<Review> subscriber: subscriberList) {
-				subscriber.onEvent(blockingQueue.take());
+			} else {
+				Review review = blockingQueue.take();
+				for(Subscriber<Review> subscriber: subscriberList) {
+					subscriber.onEvent(review);
+				}
 			}
 		}
 	}
