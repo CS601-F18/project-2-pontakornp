@@ -15,21 +15,6 @@ public class Config {
 	private String inputFileName2;
 	private String outputFileName1;
 	private String outputFileName2;
-
-	public Config() {
-		inputFileName1 = "";
-		inputFileName2 = "";
-		outputFileName1 = "";
-		outputFileName2 = "";
-//		setFileNames();
-	}
-	
-	public Config(String inputFileName1, String inputFileName2, String outputFileName1, String outputFileName2) {
-		this.inputFileName1 = inputFileName1;
-		this.inputFileName2 = inputFileName2;
-		this.outputFileName1 = outputFileName1;
-		this.outputFileName2 = outputFileName2;
-	}
 	
 	public void setInputFileName1(String inputFileName1) {
 		this.inputFileName1 = inputFileName1;
@@ -43,7 +28,7 @@ public class Config {
 		this.inputFileName2 = inputFileName2;
 	}
 	
-	public String setInputFileName2() {
+	public String getInputFileName2() {
 		return this.inputFileName2;
 	}
 	

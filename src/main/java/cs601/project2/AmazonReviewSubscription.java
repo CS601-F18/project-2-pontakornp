@@ -10,29 +10,36 @@ public class AmazonReviewSubscription {
 //		}
 		String fileName1 = "home_kitchen_sample.json";
 		String fileName2 = "app_android_sample.json";
-		SynchronousOrderedDispatchBroker sodb = new SynchronousOrderedDispatchBroker();
-		ReviewPublisher p1 = new ReviewPublisher(sodb, fileName1);
-		ReviewPublisher p2 = new ReviewPublisher(sodb, fileName2);
+//		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
+		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker();
+//		AsynUnorderedDispatchBroker broker = new AysncUnorderedDispatchBroker();
+		Config config = new Config();
+		config.setFileNames();
+		fileName1 = config.getInputFileName1();
+		fileName2 = config.getInputFileName2();
+		ReviewPublisher p1 = new ReviewPublisher(broker, fileName1);
+		ReviewPublisher p2 = new ReviewPublisher(broker, fileName2);
 		ReviewSubscriber s1 = new ReviewSubscriber();
 		ReviewSubscriber s2 = new ReviewSubscriber();
-//		AsyncOrderedDispatchBroker aodb = new AsyncOrderedDispatchBroker();
-//		AsynUnorderedDispatchBroker audb = new AysncUnorderedDispatchBroker();
+
 		//subscribe to broker
-		sodb.subscribe(s1);
-		sodb.subscribe(s2);
+		broker.subscribe(s1);
+		broker.subscribe(s2);
 		//start timer
 		
-		Thread t1 = new Thread(p1);
-		Thread t2 = new Thread(p2);
-		t1.start();
-		t2.start();
+		Thread publisherThread1 = new Thread(p1);
+		Thread publisherThread2 = new Thread(p2);
+		Thread aodbThread = new Thread(broker);
+		aodbThread.start();
+		publisherThread1.start();
+		publisherThread2.start();
 		try {
-			t1.join();
-			t2.join();
+			publisherThread1.join();
+			publisherThread2.join();
 		} catch (InterruptedException e) {
 			System.out.println("Pleas try again.");
 		}
-		sodb.shutdown();
+		broker.shutdown();
 		System.out.println("Done");
 	}
 
