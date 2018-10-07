@@ -8,7 +8,7 @@ public class AsyncOrderedDispatchBroker implements Broker<Review>, Runnable{
 	private boolean running;
 	
 	public AsyncOrderedDispatchBroker() {
-		blockingQueue = new ReviewBlockingQueue(32);
+		blockingQueue = new ReviewBlockingQueue(64);
 		subscriberList = new ArrayList<Subscriber<Review>>();
 		running = true;
 	}

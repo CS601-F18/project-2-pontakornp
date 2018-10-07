@@ -1,16 +1,18 @@
 package cs601.project2;
 
+import java.io.IOException;
+
 public class AmazonReviewSubscription {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException{
 //		if(args.length != 4) {
 //			System.out.println("Incorrect input format.\n"
 //				+ "Please try again.");
 //			return;
 //		}
 		
-		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
-//		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker();
+//		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
+		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker();
 //		AsynUnorderedDispatchBroker broker = new AysncUnorderedDispatchBroker();
 		Config config = new Config();
 		config.setFileNames();
@@ -24,7 +26,6 @@ public class AmazonReviewSubscription {
 		ReviewPublisher p2 = new ReviewPublisher(broker, fileName2);
 		ReviewSubscriber s1 = new ReviewSubscriber();
 		ReviewSubscriber s2 = new ReviewSubscriber();
-
 		//subscribe to broker
 		broker.subscribe(s1);
 		broker.subscribe(s2);
@@ -33,15 +34,15 @@ public class AmazonReviewSubscription {
 		;
 		Thread publisherThread1 = new Thread(p1);
 		Thread publisherThread2 = new Thread(p2);
-//		Thread brokerThread = new Thread(broker);
-//		brokerThread.start();
+		Thread brokerThread = new Thread(broker);
+		brokerThread.start();
 		publisherThread1.start();
 		publisherThread2.start();
 		try {
 			publisherThread1.join();
 			publisherThread2.join();
-//			broker.shutdown();
-//			brokerThread.join();
+			broker.shutdown();
+			brokerThread.join();
 		} catch (InterruptedException e) {
 			System.out.println("Please try again.");
 		}
