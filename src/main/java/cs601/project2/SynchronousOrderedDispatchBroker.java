@@ -6,24 +6,31 @@ public class SynchronousOrderedDispatchBroker implements Broker<Review> {
 	private ArrayList<Subscriber<Review>> subscribers;
 	
 	public SynchronousOrderedDispatchBroker() {
-		subscribers = new ArrayList<Subscriber<Review>>();
+		this.subscribers = new ArrayList<Subscriber<Review>>();
 	}
 	
 	public synchronized void publish(Review review) {
-		
 		for(Subscriber<Review> subscriber: subscribers) {
-			subscriber.onEvent(review);
+			ReviewSubscriber rs = (ReviewSubscriber)subscriber;
+			if(review.getUnixReviewTime() > 1362268800) {
+				if(rs.getType() == "new") {
+					subscriber.onEvent(review);
+					return;
+				}
+			} else {
+				if(rs.getType() == "old") {
+					subscriber.onEvent(review);
+					return;
+				}
+			}
 		}
 	}
 
 	public void subscribe(Subscriber<Review> subscriber) {
-		this.subscribers.add(subscriber);
+		subscribers.add(subscriber);
 	}
 
 	public void shutdown() {
 		//return
 	}
-	
-	///look at exampleeeeeeeeeeeeeeeeeeeeeeeee facebook
-
 }

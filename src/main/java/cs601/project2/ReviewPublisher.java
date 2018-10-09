@@ -12,13 +12,15 @@ import com.google.gson.JsonSyntaxException;
 
 public class ReviewPublisher implements Runnable{
 	private Broker<Review> broker;
-	private String fileName;
 	private boolean running;
+	private Charset cs;
+	private Path path;
 	
 	public ReviewPublisher(Broker<Review> broker, String fileName) {
 		this.broker = broker;
-		this.fileName = fileName;
 		this.running = true;
+		this.cs = Charset.forName("ISO-8859-1");
+		this.path = Paths.get(fileName);
 	}
 	
 	/**
@@ -30,8 +32,8 @@ public class ReviewPublisher implements Runnable{
 		//call blocker publish
 		while(running) {
 			//check if msg to be publisher, if not keep blocking until the checker been notify
-			Charset cs = Charset.forName("ISO-8859-1");
-			Path path = Paths.get(fileName);
+//			Charset cs = Charset.forName("ISO-8859-1");
+//			Path path = Paths.get(fileName);
 			try(
 				BufferedReader reader = Files.newBufferedReader(path, cs);
 			) {

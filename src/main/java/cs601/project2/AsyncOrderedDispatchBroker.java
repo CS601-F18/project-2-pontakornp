@@ -4,50 +4,56 @@ import java.util.ArrayList;
 
 public class AsyncOrderedDispatchBroker implements Broker<Review>, Runnable{
 	private ReviewBlockingQueue blockingQueue;
-	private ArrayList<Subscriber<Review>> subscriberList;
+	private ArrayList<Subscriber<Review>> subscribers;
 	private boolean running;
 	
 	public AsyncOrderedDispatchBroker() {
-		blockingQueue = new ReviewBlockingQueue(64);
-		subscriberList = new ArrayList<Subscriber<Review>>();
-		running = true;
+		this.blockingQueue = new ReviewBlockingQueue(128);
+		this.subscribers = new ArrayList<Subscriber<Review>>();
+		this.running = true;
 	}
+	
 	public void publish(Review review) {
 		blockingQueue.put(review);
-		synchronized(subscriberList) {
-			subscriberList.notify();
-		}
 	}
 	
 	public void subscribe(Subscriber<Review> subscriber) {
-		subscriberList.add(subscriber);
+		subscribers.add(subscriber);
 	}
 	
 	public void shutdown() {
 		while(!blockingQueue.isEmpty()) {
 			running = true;
 		}
+		for(Subscriber<Review> subscriber: subscribers) {
+			((ReviewSubscriber)subscriber).closeWriter();
+		}
 		running = false;
 	}
 	
 	public void run() {
 		while(running) {
-			if(blockingQueue.isEmpty()) {
-				synchronized(subscriberList) {
-					try {
-						subscriberList.wait();
-					} catch (InterruptedException e) {
-						System.out.println("Please try again.");
-					} catch (Exception e) {
-						System.out.println("for checking");
+			Review review = blockingQueue.poll(100);
+			if(review != null) {
+				for(Subscriber<Review> subscriber: subscribers) {
+					if(review.getUnixReviewTime() > 1362268800) {
+						if(((ReviewSubscriber)subscriber).getType() == "new") {
+							subscriber.onEvent(review);
+							break;
+						}
+					} else {
+						if(((ReviewSubscriber)subscriber).getType() == "old") {
+							subscriber.onEvent(review);
+							break;
+						}
 					}
-				}
-			} else {
-				Review review = blockingQueue.take();
-				for(Subscriber<Review> subscriber: subscriberList) {
-					subscriber.onEvent(review);
 				}
 			}
 		}
 	}
 }
+
+// publisher keep call publish method pass review
+// keep item in queue
+// another thread takes out from the queue
+// broker keep send item to subscriber if queue is not empty

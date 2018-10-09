@@ -1,5 +1,7 @@
 package cs601.project2;
 
+import java.util.concurrent.TimeUnit;
+
 public class ReviewBlockingQueue {
 	private Review[] reviews;
 	private int start;
@@ -14,7 +16,6 @@ public class ReviewBlockingQueue {
 	}
 
 	public synchronized void put(Review review) {
-		
 		while(size == reviews.length) {
 			try {
 				this.wait();
@@ -34,7 +35,6 @@ public class ReviewBlockingQueue {
 
 
 	public synchronized Review take() {
-		
 		while(size == 0) {
 			try {
 				this.wait();
@@ -55,6 +55,28 @@ public class ReviewBlockingQueue {
 
 	public synchronized boolean isEmpty() {
 		return size == 0;
+	}
+	
+	public synchronized Review poll(long timeout) {
+		boolean isWaiting = true;
+		while(size == 0 && isWaiting) {
+			try {
+				this.wait(timeout);
+			} catch (InterruptedException e) {
+				System.out.println("wait fail.");
+			}
+			isWaiting = false;
+		}
+		if(size == 0) {
+			return null;
+		}
+		Review review = reviews[start];
+		start = (start+1)%reviews.length;
+		size--;
+		if(size == reviews.length-1) {
+			this.notifyAll();
+		}
+		return review;
 	}
 }
 
