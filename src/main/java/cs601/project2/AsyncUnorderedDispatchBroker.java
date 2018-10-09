@@ -1,6 +1,6 @@
 package cs601.project2;
 
-public class AsynUnorderedDispatchBroker implements Broker<Review> {
+public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 	public void publish(Review item) {
 		
 	}
