@@ -9,28 +9,20 @@ public class SynchronousOrderedDispatchBroker implements Broker<Review> {
 		this.subscribers = new ArrayList<Subscriber<Review>>();
 	}
 	
+	@Override
 	public synchronized void publish(Review review) {
 		for(Subscriber<Review> subscriber: subscribers) {
-			ReviewSubscriber rs = (ReviewSubscriber)subscriber;
-			if(review.getUnixReviewTime() > 1362268800) {
-				if(rs.getType() == "new") {
-					subscriber.onEvent(review);
-					return;
-				}
-			} else {
-				if(rs.getType() == "old") {
-					subscriber.onEvent(review);
-					return;
-				}
-			}
+			subscriber.onEvent(review);
 		}
 	}
 
+	@Override
 	public void subscribe(Subscriber<Review> subscriber) {
 		subscribers.add(subscriber);
 	}
 
+	@Override
 	public void shutdown() {
-		//return
+		//
 	}
 }

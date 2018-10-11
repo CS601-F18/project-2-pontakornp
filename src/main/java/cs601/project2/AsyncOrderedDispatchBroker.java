@@ -2,55 +2,57 @@ package cs601.project2;
 
 import java.util.ArrayList;
 
-public class AsyncOrderedDispatchBroker implements Broker<Review>, Runnable{
-	private ReviewBlockingQueue blockingQueue;
+public class AsyncOrderedDispatchBroker implements Broker<Review>{
 	private ArrayList<Subscriber<Review>> subscribers;
-	private boolean running;
+	private ReviewBlockingQueue rbq;
+	private AsyncOrderedDispatchBrokerHandler handler;
 	
 	public AsyncOrderedDispatchBroker() {
-		this.blockingQueue = new ReviewBlockingQueue(128);
 		this.subscribers = new ArrayList<Subscriber<Review>>();
-		this.running = true;
+		this.rbq = new ReviewBlockingQueue(16);
+		this.handler = new AsyncOrderedDispatchBrokerHandler(subscribers, rbq);
+		startHandlerThread();
 	}
 	
+	public void startHandlerThread() {
+		Thread handlerThread = new Thread(handler);
+		handlerThread.start();
+		try {
+			handlerThread.join();
+		} catch (InterruptedException e) {
+			System.out.println("Please try again.");
+		}
+	}
+	
+	@Override
 	public void publish(Review review) {
-		blockingQueue.put(review);
+		rbq.put(review);
 	}
 	
+	@Override
 	public void subscribe(Subscriber<Review> subscriber) {
 		subscribers.add(subscriber);
 	}
 	
+	@Override
 	public void shutdown() {
-		while(!blockingQueue.isEmpty()) {
-			running = true;
+		while(!rbq.isEmpty()) {
+//			running = true;
 		}
-		for(Subscriber<Review> subscriber: subscribers) {
-			((ReviewSubscriber)subscriber).closeWriter();
-		}
-		running = false;
+		handler.shutdown();
 	}
 	
-	public void run() {
-		while(running) {
-			Review review = blockingQueue.poll(100);
-			if(review != null) {
-				for(Subscriber<Review> subscriber: subscribers) {
-					if(review.getUnixReviewTime() > 1362268800) {
-						if(((ReviewSubscriber)subscriber).getType() == "new") {
-							subscriber.onEvent(review);
-							break;
-						}
-					} else {
-						if(((ReviewSubscriber)subscriber).getType() == "old") {
-							subscriber.onEvent(review);
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
+//	@Override
+//	public void run() {
+//		while(running) {
+//			Review review = rbq.poll(2);
+//			if(review != null) {
+//				for(Subscriber<Review> subscriber: subscribers) {
+//					subscriber.onEvent(review);
+//				}
+//			}
+//		}
+//	}
 }
 
 // publisher keep call publish method pass review

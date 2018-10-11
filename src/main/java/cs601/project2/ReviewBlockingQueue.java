@@ -1,6 +1,5 @@
 package cs601.project2;
 
-import java.util.concurrent.TimeUnit;
 
 public class ReviewBlockingQueue {
 	private Review[] reviews;
@@ -58,18 +57,25 @@ public class ReviewBlockingQueue {
 	}
 	
 	public synchronized Review poll(long timeout) {
-		boolean isWaiting = true;
-		while(size == 0 && isWaiting) {
+		long pollStart = System.currentTimeMillis();
+		long pollEnd = 0;
+		while(size == 0) {
 			try {
 				this.wait(timeout);
 			} catch (InterruptedException e) {
-				System.out.println("wait fail.");
+				System.out.println("wait fail");
 			}
-			isWaiting = false;
+			pollEnd = System.currentTimeMillis();
+			if((pollEnd - pollStart) >= timeout) {
+				return null;
+			}
+			timeout = timeout - (pollEnd - pollStart);
+//			System.out.println("Timeout remaining: " + timeout);
 		}
-		if(size == 0) {
-			return null;
-		}
+//		System.out.println("Size not 0");
+		// size > 0 return review
+		// wakes up size == 0 timeout pass return null
+		// wakes up size == 0 timeout not pass keep waiting
 		Review review = reviews[start];
 		start = (start+1)%reviews.length;
 		size--;

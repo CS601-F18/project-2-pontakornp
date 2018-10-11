@@ -30,22 +30,21 @@ public class ReviewSubscriber implements Subscriber<Review> {
 	
 	public void onEvent(Review review) {
 		String reviewRecord = gson.toJson(review);
-		try {
-			writer.write(reviewRecord+"\n");
-		} catch (IOException e) {
-			System.out.print("There is an issue when writing to file. Please try again.");
+		if((review.getUnixReviewTime() > 1362268800 && type == "new") || 
+			(review.getUnixReviewTime() <= 1362268800 && type == "old")) {
+			try {
+				writer.write(reviewRecord+"\n");
+			} catch (IOException e) {
+				System.out.print("There is an issue when writing to file. Please try again.");
+			}
 		}
 	}
-	
-	public String getType() {
-		return this.type;
-	}
-	
-	public void closeWriter() {
+
+	public void shutdown() {
 		try {
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Cannot close file.");
 		}
 	}
 }

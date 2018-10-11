@@ -12,8 +12,8 @@ public class AmazonReviewSubscription {
 //		}
 		
 //		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
-		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker();
-//		AsynUnorderedDispatchBroker broker = new AysncUnorderedDispatchBroker();
+//		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker();
+		AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker();
 		Config config = new Config();
 		config.setFileNames();
 		String inputFileName1 = config.getInputFileName1();
@@ -25,9 +25,6 @@ public class AmazonReviewSubscription {
 //		String inputFileName1 = "home_kitchen_sample.json";
 //		String inputFileName2 = "app_android_sample.json";
 		
-		
-//		String inputFileName1 = "reviews_Home_and_Kitchen_5.json";
-//		String inputFileName2 = "reviews_Apps_for_Android_5.json";
 		ReviewPublisher p1 = new ReviewPublisher(broker, inputFileName1);
 		ReviewPublisher p2 = new ReviewPublisher(broker, inputFileName2);
 		ReviewSubscriber s1 = new ReviewSubscriber(outputFileName1, "new");
@@ -35,24 +32,27 @@ public class AmazonReviewSubscription {
 		//subscribe to broker
 		broker.subscribe(s1);
 		broker.subscribe(s2);
+		
 		//start timer
 		long start = System.currentTimeMillis();
-		;
+		
 		Thread publisherThread1 = new Thread(p1);
 		Thread publisherThread2 = new Thread(p2);
-		Thread brokerThread = new Thread(broker);
-		brokerThread.start();
+//		Thread brokerThread = new Thread(broker);
+//		brokerThread.start();
 		publisherThread1.start();
 		publisherThread2.start();
 		try {
 			publisherThread1.join();
 			publisherThread2.join();
 			broker.shutdown();
-			brokerThread.join();
-			
+			s1.shutdown();
+			s2.shutdown();
+//			brokerThread.join();
 		} catch (InterruptedException e) {
 			System.out.println("Please try again.");
 		}
+		
 		//stop timer
 		long end = System.currentTimeMillis();
 		
