@@ -15,6 +15,9 @@ public class Config {
 	private String inputFileName2;
 	private String outputFileName1;
 	private String outputFileName2;
+	private int blockingQueueSize;
+	private int pollTimeout;
+	private int nThreads;
 	
 	public void setInputFileName1(String inputFileName1) {
 		this.inputFileName1 = inputFileName1;
@@ -47,11 +50,35 @@ public class Config {
 	public String getOutputFileName2() {
 		return outputFileName2;
 	}
+	
+	public void setBlockingQueueSize(int blockingQueueSize) {
+		this.blockingQueueSize = blockingQueueSize;
+	}
+	
+	public int getBlockingQueueSize() {
+		return blockingQueueSize;
+	}
+	
+	public void setPollTimeout(int pollTimeout) {
+		this.pollTimeout = pollTimeout;
+	}
+	
+	public int getPollTimeout() {
+		return pollTimeout;
+	}
+	
+	public void setNThreads(int nThreads) {
+		this.nThreads = nThreads;
+	}
+	
+	public int getNThreads() {
+		return nThreads;
+	}
 
-	public void setFileNames() {
+	public void setVariables() {
 		Charset cs = Charset.forName("ISO-8859-1");
 		Path path = Paths.get("config.json");
-		Config fileNames = new Config();
+		Config config = new Config();
 		try(
 			BufferedReader reader = Files.newBufferedReader(path, cs);
 		) {
@@ -59,11 +86,14 @@ public class Config {
 			Gson gson = new Gson();
 			while((line = reader.readLine()) != null) {
 				try {
-					fileNames = gson.fromJson(line, Config.class); // parse filenames from config file to config object
-					this.inputFileName1 = fileNames.inputFileName1;
-					this.inputFileName2 = fileNames.inputFileName2;
-					this.outputFileName1 = fileNames.outputFileName1;
-					this.outputFileName2 = fileNames.outputFileName2;
+					config = gson.fromJson(line, Config.class); // parse filenames from config file to config object
+					this.inputFileName1 = config.inputFileName1;
+					this.inputFileName2 = config.inputFileName2;
+					this.outputFileName1 = config.outputFileName1;
+					this.outputFileName2 = config.outputFileName2;
+					this.blockingQueueSize = config.blockingQueueSize;
+					this.pollTimeout = config.pollTimeout;
+					this.nThreads = config.nThreads;
 				} catch(JsonSyntaxException jse) {
 					// skip
 				}

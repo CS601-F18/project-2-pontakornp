@@ -1,0 +1,1 @@
+{"inputFileName1": "reviews_Home_and_Kitchen_5.json", "inputFileName2": "reviews_Apps_for_Android_5.json", "outputFileName1": "new_reviews.json", "outputFileName2": "old_reviews.json", "blockingQueueSize": 32, "pollTimeout": 20, "nThreads": 20}

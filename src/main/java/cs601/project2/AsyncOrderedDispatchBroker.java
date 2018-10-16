@@ -8,10 +8,10 @@ public class AsyncOrderedDispatchBroker implements Broker<Review>{
 	private AsyncOrderedDispatchBrokerHandler handler;
 	private Thread handlerThread;
 	
-	public AsyncOrderedDispatchBroker() {
+	public AsyncOrderedDispatchBroker(int blockingQueueSize, int pollTimeout) {
 		this.subscribers = new ArrayList<Subscriber<Review>>();
-		this.rbq = new ReviewBlockingQueue(32);
-		this.handler = new AsyncOrderedDispatchBrokerHandler(subscribers, rbq);
+		this.rbq = new ReviewBlockingQueue(blockingQueueSize);
+		this.handler = new AsyncOrderedDispatchBrokerHandler(subscribers, rbq, pollTimeout);
 		this.handlerThread = new Thread(handler);
 		handlerThread.start();
 	}

@@ -5,11 +5,9 @@ import java.io.IOException;
 public class AmazonReviewSubscription {
 
 	public static void main(String[] args) throws IOException{
-//		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
-//		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker();
-		AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker();
+		
 		Config config = new Config();
-		config.setFileNames();
+		config.setVariables();
 		String inputFileName1 = config.getInputFileName1();
 		String inputFileName2 = config.getInputFileName2();
 		String outputFileName1 = config.getOutputFileName1();
@@ -18,6 +16,14 @@ public class AmazonReviewSubscription {
 //		String outputFileName2 = "old_reviews2.json";
 //		String inputFileName1 = "home_kitchen_sample.json";
 //		String inputFileName2 = "app_android_sample.json";
+		
+		int blockingQueueSize = config.getBlockingQueueSize();
+		int pollTimeout = config.getPollTimeout();
+		int nThreads = config.getNThreads();
+		//broker
+//		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
+//		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker(blockingQueueSize, pollTimeout);
+		AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker(nThreads);
 		
 		ReviewPublisher p1 = new ReviewPublisher(broker, inputFileName1);
 		ReviewPublisher p2 = new ReviewPublisher(broker, inputFileName2);

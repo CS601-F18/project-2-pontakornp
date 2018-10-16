@@ -9,9 +9,9 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 	private ArrayList<Subscriber<Review>> subscribers;
 	private ExecutorService pool;
 	
-	public AsyncUnorderedDispatchBroker() {
-		subscribers = new ArrayList<Subscriber<Review>>();
-		pool = Executors.newFixedThreadPool(20);
+	public AsyncUnorderedDispatchBroker(int nThreads) {
+		this.subscribers = new ArrayList<Subscriber<Review>>();
+		this.pool = Executors.newFixedThreadPool(nThreads);
 	}
 	
 	@Override
