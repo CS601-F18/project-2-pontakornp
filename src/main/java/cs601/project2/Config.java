@@ -21,7 +21,7 @@ public class Config {
 	}
 	
 	public String getInputFileName1() {
-		return this.inputFileName1;
+		return inputFileName1;
 	}
 	
 	public void setInputFileName2(String inputFileName2) {
@@ -29,7 +29,7 @@ public class Config {
 	}
 	
 	public String getInputFileName2() {
-		return this.inputFileName2;
+		return inputFileName2;
 	}
 	
 	public void setOutputFileName1(String outputFileName1) {
@@ -37,7 +37,7 @@ public class Config {
 	}
 	
 	public String getOutputFileName1() {
-		return this.outputFileName1;
+		return outputFileName1;
 	}
 	
 	public void setOutputFileName2(String outputFileName2) {
@@ -45,7 +45,7 @@ public class Config {
 	}
 	
 	public String getOutputFileName2() {
-		return this.outputFileName2;
+		return outputFileName2;
 	}
 
 	public void setFileNames() {

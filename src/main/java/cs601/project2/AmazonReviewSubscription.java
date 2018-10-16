@@ -5,12 +5,6 @@ import java.io.IOException;
 public class AmazonReviewSubscription {
 
 	public static void main(String[] args) throws IOException{
-//		if(args.length != 4) {
-//			System.out.println("Incorrect input format.\n"
-//				+ "Please try again.");
-//			return;
-//		}
-		
 //		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
 //		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker();
 		AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker();
@@ -38,8 +32,6 @@ public class AmazonReviewSubscription {
 		
 		Thread publisherThread1 = new Thread(p1);
 		Thread publisherThread2 = new Thread(p2);
-//		Thread brokerThread = new Thread(broker);
-//		brokerThread.start();
 		publisherThread1.start();
 		publisherThread2.start();
 		try {
@@ -48,7 +40,6 @@ public class AmazonReviewSubscription {
 			broker.shutdown();
 			s1.shutdown();
 			s2.shutdown();
-//			brokerThread.join();
 		} catch (InterruptedException e) {
 			System.out.println("Please try again.");
 		}

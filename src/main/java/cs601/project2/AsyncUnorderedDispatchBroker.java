@@ -11,7 +11,7 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 	
 	public AsyncUnorderedDispatchBroker() {
 		subscribers = new ArrayList<Subscriber<Review>>();
-		pool = Executors.newFixedThreadPool(30);
+		pool = Executors.newFixedThreadPool(20);
 	}
 	
 	@Override
@@ -29,11 +29,14 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 	@Override
 	public void shutdown() {
 		pool.shutdown();
-		try {
-			pool.awaitTermination(100, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			System.out.println("shutdown");
+		while(!pool.isTerminated()) {
+			
 		}
+//		try {
+//			pool.awaitTermination(100, TimeUnit.MILLISECONDS);
+//		} catch (InterruptedException e) {
+//			System.out.println("shutdown");
+//		}
 	}
 
 }

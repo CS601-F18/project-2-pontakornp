@@ -28,6 +28,7 @@ public class ReviewSubscriber implements Subscriber<Review> {
 		this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName),cs));
 	}
 	
+	@Override
 	public void onEvent(Review review) {
 		String reviewRecord = gson.toJson(review);
 		if((review.getUnixReviewTime() > 1362268800 && type == "new") || 

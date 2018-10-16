@@ -15,17 +15,23 @@ public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 	
 	@Override
 	public void run() {
+		int count = 1;
 		while(running) {
-			Review review = rbq.poll(2);
+			Review review = rbq.poll(20);
 			if(review != null) {
 				for(Subscriber<Review> subscriber: subscribers) {
 					subscriber.onEvent(review);
 				}
+			} else {
+				System.out.println(count++);
 			}
 		}
 	}
 	
 	public void shutdown() {
+		while(!rbq.isEmpty()) {
+//			running = true;
+		}
 		running = false;
 	}
 	
