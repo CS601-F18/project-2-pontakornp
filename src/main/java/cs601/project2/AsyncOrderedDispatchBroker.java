@@ -2,6 +2,21 @@ package cs601.project2;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * AsyncOrderedDispatchBroker - one of the three brokers for this project.
+ * Is an intermediary that pass on Amazon review item to from publisher to subscriber.
+ * 
+ * Works asynchronously by receiving review items from publisher, put item in the blocking queue, 
+ * and return back to publisher right away without waiting for the process of sending to subscribers to be done,
+ * while another thread tries to take from the queue if there is an item and send to subscribers in order.
+ * 
+ * Uses blocking queue, ReviewBlockingQueue, as a helper to manage the synchronization of items inside it.
+ * Uses helper class, AsyncOrderedDispatchBrokerHandler, as a thread to take the item from the queue and send to subscriber.
+ *
+ */
 public class AsyncOrderedDispatchBroker implements Broker<Review>{
 	private ArrayList<Subscriber<Review>> subscribers;
 	private ReviewBlockingQueue rbq;

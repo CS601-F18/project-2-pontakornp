@@ -2,6 +2,14 @@ package cs601.project2;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * Helper class for AsyncOrderedDispatchBroker.
+ * Is a thread that take (poll method) item and the blocking queue and send it to subscribers if available.
+ *
+ */
 public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 	private ArrayList<Subscriber<Review>> subscribers;
 	private ReviewBlockingQueue rbq;
@@ -27,9 +35,12 @@ public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 		}
 	}
 	
+	/**
+	 * Changes running value to false if the blocking queue is empty
+	 */
 	public void shutdown() {
 		while(!rbq.isEmpty()) {
-//			running = true;
+			
 		}
 		running = false;
 	}

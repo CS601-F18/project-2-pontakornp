@@ -1,6 +1,14 @@
 package cs601.project2;
 
-
+/**
+ * 
+ * @author pontakornp
+ *
+ * Review Blocking Queue has the same logic as the blocking queue in java library.
+ * 
+ * Manages the synchronization of putting or taking items from the queue.
+ * Also includes poll method that is similar to take method but wit
+ */
 public class ReviewBlockingQueue {
 	private Review[] reviews;
 	private int start;
@@ -14,6 +22,13 @@ public class ReviewBlockingQueue {
 		this.size = 0;
 	}
 
+	/**
+	 * Put an item in the queue if the queue is not full.
+	 * If the queue is full, wait until there is space in the queue,
+	 * then put that item in the queue.
+	 * 
+	 * @param review
+	 */
 	public synchronized void put(Review review) {
 		while(size == reviews.length) {
 			try {
@@ -32,7 +47,13 @@ public class ReviewBlockingQueue {
 		
 	}
 
-
+	/**
+	 * Returns an item if the queue is not empty.
+	 * If the queue is empty, wait until an item has been added to the queue,
+	 * then return that item.
+	 * 
+	 * @return item
+	 */
 	public synchronized Review take() {
 		while(size == 0) {
 			try {
@@ -51,11 +72,28 @@ public class ReviewBlockingQueue {
 		return review;
 	}
 
-
+	/**
+	 * 
+	 * Checks if queue is empty or not
+	 * 
+	 * @return true or false
+	 */
 	public synchronized boolean isEmpty() {
 		return size == 0;
 	}
 	
+	/**
+	 * 
+	 * @param timeout - time in millisecond
+	 * @return item
+	 * 
+	 * Works similarly to take method but with a timeout
+	 * 
+	 * 3 scenario that could happens when calling poll method.
+	 * 1. When queue has an item, return the item
+	 * 2. When queue is empty, but the timeout has not reached, wait for item to be added in the queue
+	 * 3. When queue is empty, but the timeout has expired, return null
+	 */
 	public synchronized Review poll(long timeout) {
 		long pollStart = System.currentTimeMillis();
 		long pollEnd = 0;
@@ -70,12 +108,7 @@ public class ReviewBlockingQueue {
 				return null;
 			}
 			timeout = timeout - (pollEnd - pollStart);
-//			System.out.println("Timeout remaining: " + timeout);
 		}
-//		System.out.println("Size not 0");
-		// size > 0 return review
-		// wakes up size == 0 timeout pass return null
-		// wakes up size == 0 timeout not pass keep waiting
 		Review review = reviews[start];
 		start = (start+1)%reviews.length;
 		size--;
@@ -85,20 +118,3 @@ public class ReviewBlockingQueue {
 		return review;
 	}
 }
-
-
-// keep taking when q empty then block if queue not empty continue
-
-// somethign to notify waiting item, and waiting 
-
-// taker is waiting cuz q is empty
-
-//
-//while run true{
-//	if q is empty
-//	taker wait
-//	else
-//	take
-//}
-//
-//notify it when broker put item in queue

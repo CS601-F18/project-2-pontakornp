@@ -2,6 +2,20 @@ package cs601.project2;
 
 import java.io.IOException;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * Main class for Project 2 in CS601 Principles of Software Development class at USF.
+ * Uses Publishers/ Subscribers design to implement logics to separate old and new Amazon reviews files.
+ * 
+ * Includes the use of 3 different kinds of broker (SyncOrdered, AsyncOrdered, and AsyncUnordered) 
+ * as in intermediary between publishers and subscribers.
+ * 
+ * Only the broker knows who the publisher or subscriber is, but publisher and subscriber do not know each other.
+ * Implements 2 publisher and 2 subscribers according to project specifications.
+ *
+ */
 public class AmazonReviewSubscription {
 
 	public static void main(String[] args) throws IOException{
@@ -17,25 +31,30 @@ public class AmazonReviewSubscription {
 //		String inputFileName1 = "home_kitchen_sample.json";
 //		String inputFileName2 = "app_android_sample.json";
 		
+		long separatedUnixReviewTime = config.getSeparatedUnixReviewTime();
 		int blockingQueueSize = config.getBlockingQueueSize();
 		int pollTimeout = config.getPollTimeout();
 		int nThreads = config.getNThreads();
-		//broker
+		
+		// instantiates broker
 //		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
 //		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker(blockingQueueSize, pollTimeout);
 		AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker(nThreads);
 		
+		// instantiates publishers and subscribers
 		ReviewPublisher p1 = new ReviewPublisher(broker, inputFileName1);
 		ReviewPublisher p2 = new ReviewPublisher(broker, inputFileName2);
-		ReviewSubscriber s1 = new ReviewSubscriber(outputFileName1, "new");
-		ReviewSubscriber s2 = new ReviewSubscriber(outputFileName2, "old");
-		//subscribe to broker
+		ReviewSubscriber s1 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName1, "new");
+		ReviewSubscriber s2 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName2, "old");
+		
+		// subscribers subscribe to broker
 		broker.subscribe(s1);
 		broker.subscribe(s2);
 		
-		//start timer
+		// start timer
 		long start = System.currentTimeMillis();
 		
+		// run publishers threads
 		Thread publisherThread1 = new Thread(p1);
 		Thread publisherThread2 = new Thread(p2);
 		publisherThread1.start();
@@ -50,7 +69,7 @@ public class AmazonReviewSubscription {
 			System.out.println("Please try again.");
 		}
 		
-		//stop timer
+		// stop timer
 		long end = System.currentTimeMillis();
 		
 		System.out.println("Time: " + Math.round((end-start) / 1000) + " seconds" );

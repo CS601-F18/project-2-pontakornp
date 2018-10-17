@@ -2,6 +2,18 @@ package cs601.project2;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ *
+ * SyncronousOrderedDispatchBroker - one of the three brokers for this project.
+ * Is an intermediary that pass on Amazon review item to from publisher to subscriber.
+ * 
+ * Works synchronously by receiving review items from publisher and send items to current subscribers before returning to publishers.
+ * Items are sent to each subscribers in the same order.
+ *
+ */
 public class SynchronousOrderedDispatchBroker implements Broker<Review> {
 	private ArrayList<Subscriber<Review>> subscribers;
 	
@@ -23,6 +35,6 @@ public class SynchronousOrderedDispatchBroker implements Broker<Review> {
 
 	@Override
 	public void shutdown() {
-		//
+		
 	}
 }

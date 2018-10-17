@@ -4,9 +4,10 @@ package cs601.project2;
  * 
  * @author pontakornp
  * 
- * This class represents review.
+ * This class represents Amazon review.
  * It contains review records in json format.
  * 
+ * Example of review record:
  * {"reviewerID": "APYOBQE6M18AA", "asin": "0615391206", "reviewerName": "Martin Schwartz", "helpful": [0, 0], "reviewText": "My daughter wanted this book and the price on Amazon was the best.  She has already tried one recipe a day after receiving the book.  She seems happy with it.", "overall": 5.0, "summary": "Best Price", "unixReviewTime": 1382140800, "reviewTime": "10 19, 2013"}
  */
 public class Review{

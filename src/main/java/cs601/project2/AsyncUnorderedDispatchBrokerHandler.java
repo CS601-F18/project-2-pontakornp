@@ -1,5 +1,13 @@
 package cs601.project2;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * Helper class for AsyncUnorderedDispatchBroker.
+ * Works as a thread to be instantiated in the thread pool to send item to current subscribers.
+ *
+ */
 public class AsyncUnorderedDispatchBrokerHandler implements Runnable {
 	private Subscriber<Review> subscriber;
 	private Review review;
@@ -9,6 +17,7 @@ public class AsyncUnorderedDispatchBrokerHandler implements Runnable {
 		this.review = review;
 	}
 	
+	@Override
 	public void run() {
 		subscriber.onEvent(review);
 	}

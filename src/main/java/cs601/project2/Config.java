@@ -10,11 +10,20 @@ import java.nio.file.Paths;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * Serves as the config class that read from config.json file
+ * Contains variables that helps neglect hard coding in the implementations.
+ *
+ */
 public class Config {
 	private String inputFileName1;
 	private String inputFileName2;
 	private String outputFileName1;
 	private String outputFileName2;
+	private long separatedUnixReviewTime;
 	private int blockingQueueSize;
 	private int pollTimeout;
 	private int nThreads;
@@ -51,6 +60,14 @@ public class Config {
 		return outputFileName2;
 	}
 	
+	public void setSeparatedUnixReviewTime(long separatedUnixReviewTime) {
+		this.separatedUnixReviewTime = separatedUnixReviewTime;
+	}
+	
+	public long getSeparatedUnixReviewTime() {
+		return separatedUnixReviewTime;
+	}
+	
 	public void setBlockingQueueSize(int blockingQueueSize) {
 		this.blockingQueueSize = blockingQueueSize;
 	}
@@ -75,6 +92,9 @@ public class Config {
 		return nThreads;
 	}
 
+	/**
+	 * Set variables from the config.json file and assign them to variables in this class.
+	 */
 	public void setVariables() {
 		Charset cs = Charset.forName("ISO-8859-1");
 		Path path = Paths.get("config.json");
@@ -91,6 +111,7 @@ public class Config {
 					this.inputFileName2 = config.inputFileName2;
 					this.outputFileName1 = config.outputFileName1;
 					this.outputFileName2 = config.outputFileName2;
+					this.separatedUnixReviewTime = config.separatedUnixReviewTime;
 					this.blockingQueueSize = config.blockingQueueSize;
 					this.pollTimeout = config.pollTimeout;
 					this.nThreads = config.nThreads;

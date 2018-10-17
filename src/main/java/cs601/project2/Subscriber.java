@@ -1,5 +1,15 @@
 package cs601.project2;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * @param <T> - generic item
+ * 
+ * Subscriber interface is use for publisher/ subscriber design pattern.
+ * Contains onEvent method.
+ * 
+ */
 public interface Subscriber<T> {
 
 	/**

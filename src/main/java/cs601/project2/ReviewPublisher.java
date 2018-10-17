@@ -10,6 +10,15 @@ import java.nio.file.Paths;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * Review Publisher class is used for publisher/ subscriber design.
+ * 
+ * Works as a thread to send review items to broker to be sent to current subscribers
+ * 
+ */
 public class ReviewPublisher implements Runnable{
 	private Broker<Review> broker;
 	private boolean running;
@@ -23,17 +32,9 @@ public class ReviewPublisher implements Runnable{
 		this.path = Paths.get(fileName);
 	}
 	
-	/**
-	 * 
-	 * Reads from a file in the project directory given the file name, and return void
-	 * @param fileName - expects the name of the input file
-	 */
+	@Override
 	public void run() {
-		//call blocker publish
 		while(running) {
-			//check if msg to be publisher, if not keep blocking until the checker been notify
-//			Charset cs = Charset.forName("ISO-8859-1");
-//			Path path = Paths.get(fileName);
 			try(
 				BufferedReader reader = Files.newBufferedReader(path, cs);
 			) {
@@ -51,8 +52,6 @@ public class ReviewPublisher implements Runnable{
 			catch(IOException ioe) {
 				System.out.println("Please try again with correct input.");
 			}
-			//if broker is shutdown
-			// publisher = false;
 			running = false;
 		}
 	}

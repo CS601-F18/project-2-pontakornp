@@ -11,7 +11,17 @@ import java.nio.file.Paths;
 
 import com.google.gson.Gson;
 
+/**
+ * 
+ * @author pontakornp
+ *
+ * Review Subscriber class is used in publisher/ subscriber design pattern.
+ * 
+ * Contains method onEvent that write items to file and shutdown to close the buffered writer.
+ *
+ */
 public class ReviewSubscriber implements Subscriber<Review> {
+	private long separatedUnixReviewTime;
 	private String fileName;
 	private String type;
 	private Path path;
@@ -19,20 +29,28 @@ public class ReviewSubscriber implements Subscriber<Review> {
 	private Gson gson;
 	private BufferedWriter writer;
 	
-	public ReviewSubscriber(String fileName, String type) throws IOException, FileNotFoundException{
+	public ReviewSubscriber(long separatedUnixReviewTime, String fileName, String type) {
+		this.separatedUnixReviewTime = separatedUnixReviewTime;
 		this.fileName = fileName;
 		this.type = type;
 		this.path = Paths.get(fileName);
 		this.cs = Charset.forName("ISO-8859-1");
 		this.gson = new Gson();
-		this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName),cs));
+		try {
+			this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName),cs));
+		} catch (IOException e) {
+			System.out.println("There is an issue with an output file. Please try again.");
+		}
 	}
 	
+	/**
+	 * Writes review items by separating them into two files by unix review time specified in the config.
+	 */
 	@Override
 	public void onEvent(Review review) {
 		String reviewRecord = gson.toJson(review);
-		if((review.getUnixReviewTime() > 1362268800 && type == "new") || 
-			(review.getUnixReviewTime() <= 1362268800 && type == "old")) {
+		if((review.getUnixReviewTime() > separatedUnixReviewTime && type == "new") || 
+			(review.getUnixReviewTime() <= separatedUnixReviewTime && type == "old")) {
 			try {
 				writer.write(reviewRecord+"\n");
 			} catch (IOException e) {
@@ -40,12 +58,15 @@ public class ReviewSubscriber implements Subscriber<Review> {
 			}
 		}
 	}
-
+	
+	/**
+	 * Closes buffered writer
+	 */
 	public void shutdown() {
 		try {
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("Cannot close file.");
+			System.out.println("There is an issue when closing the file. Please try again.");
 		}
 	}
 }

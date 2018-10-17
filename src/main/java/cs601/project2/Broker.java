@@ -1,5 +1,14 @@
 package cs601.project2;
-
+/**
+ * 
+ * @author pontakornp
+ *
+ * @param <T> - generic item
+ * 
+ * Broker interface can be used for publisher/ subscriber design
+ * Contains publish, subscribe, and shutdown methods.
+ * 
+ */
 public interface Broker<T> {
 
 	/**
