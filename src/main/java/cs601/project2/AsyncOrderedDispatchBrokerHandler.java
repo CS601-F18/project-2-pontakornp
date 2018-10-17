@@ -23,10 +23,15 @@ public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 		this.running = true;
 	}
 	
+	/**
+	 * Run thread to take item and send to registered subscribers.
+	 * 
+	 */
 	@Override
 	public void run() {
 		while(running) {
-			Review review = rbq.poll(pollTimeout);
+			Review review = rbq.poll(pollTimeout); // Calls poll method of blocking queue to get review item or null if timeout has reached.
+			// If review has value, send review item to registered subscribers.
 			if(review != null) {
 				for(Subscriber<Review> subscriber: subscribers) {
 					subscriber.onEvent(review);
@@ -36,7 +41,7 @@ public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 	}
 	
 	/**
-	 * Changes running value to false if the blocking queue is empty
+	 * Changes running value to false if the blocking queue is empty.
 	 */
 	public void shutdown() {
 		while(!rbq.isEmpty()) {
@@ -44,5 +49,4 @@ public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 		}
 		running = false;
 	}
-	
 }

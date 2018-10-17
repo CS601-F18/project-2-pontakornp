@@ -1,13 +1,10 @@
 package cs601.project2;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import com.google.gson.Gson;
 
@@ -23,34 +20,37 @@ import com.google.gson.Gson;
 public class ReviewSubscriber implements Subscriber<Review> {
 	private long separatedUnixReviewTime;
 	private String fileName;
-	private String type;
-	private Path path;
 	private Charset cs;
 	private Gson gson;
 	private BufferedWriter writer;
+	private Config config;
+	private String outputFileName1;
+	private String outputFileName2;
 	
-	public ReviewSubscriber(long separatedUnixReviewTime, String fileName, String type) {
+	public ReviewSubscriber(long separatedUnixReviewTime, String fileName) {
 		this.separatedUnixReviewTime = separatedUnixReviewTime;
 		this.fileName = fileName;
-		this.type = type;
-		this.path = Paths.get(fileName);
 		this.cs = Charset.forName("ISO-8859-1");
 		this.gson = new Gson();
 		try {
 			this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName),cs));
 		} catch (IOException e) {
-			System.out.println("There is an issue with an output file. Please try again.");
+			System.out.println("Please try again with correct output file name.");
 		}
+		this.config = new Config();
+		this.config.setVariables();
+		this.outputFileName1 = config.getOutputFileName1();
+		this.outputFileName2 = config.getOutputFileName2();
 	}
 	
 	/**
-	 * Writes review items by separating them into two files by unix review time specified in the config.
+	 * Writes review items by separating them into two files by unix review time specified in the config file.
 	 */
 	@Override
 	public void onEvent(Review review) {
 		String reviewRecord = gson.toJson(review);
-		if((review.getUnixReviewTime() > separatedUnixReviewTime && type == "new") || 
-			(review.getUnixReviewTime() <= separatedUnixReviewTime && type == "old")) {
+		if((review.getUnixReviewTime() > separatedUnixReviewTime && fileName.equals(outputFileName1)) || 
+			(review.getUnixReviewTime() <= separatedUnixReviewTime && fileName.equals(outputFileName2))) {
 			try {
 				writer.write(reviewRecord+"\n");
 			} catch (IOException e) {
@@ -60,7 +60,7 @@ public class ReviewSubscriber implements Subscriber<Review> {
 	}
 	
 	/**
-	 * Closes buffered writer
+	 * Closes buffered writer.
 	 */
 	public void shutdown() {
 		try {

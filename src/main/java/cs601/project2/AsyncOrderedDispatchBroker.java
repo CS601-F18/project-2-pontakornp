@@ -31,16 +31,27 @@ public class AsyncOrderedDispatchBroker implements Broker<Review>{
 		handlerThread.start();
 	}
 	
+	/**
+	 * Publish method for publisher to send items to registered subscribers.
+	 * Puts review item in the queue.
+	 */
 	@Override
 	public void publish(Review review) {
 		rbq.put(review);
 	}
 	
+	/**
+	 * Subscribe method for subscribers to receive future published items.
+	 * Adds subscriber to a list.
+	 */
 	@Override
 	public void subscribe(Subscriber<Review> subscriber) {
 		subscribers.add(subscriber);
 	}
 	
+	/**
+	 * Shutdown the helper class instance and wait for the thread to stop.
+	 */
 	@Override
 	public void shutdown() {
 		handler.shutdown();

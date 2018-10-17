@@ -19,6 +19,7 @@ import com.google.gson.JsonSyntaxException;
  *
  */
 public class Config {
+	private String brokerType;
 	private String inputFileName1;
 	private String inputFileName2;
 	private String outputFileName1;
@@ -27,6 +28,14 @@ public class Config {
 	private int blockingQueueSize;
 	private int pollTimeout;
 	private int nThreads;
+	
+	public void setBrokerType(String brokerType) {
+		this.brokerType = brokerType;
+	}
+	
+	public String getBrokerType() {
+		return brokerType;
+	}
 	
 	public void setInputFileName1(String inputFileName1) {
 		this.inputFileName1 = inputFileName1;
@@ -95,7 +104,7 @@ public class Config {
 	/**
 	 * Set variables from the config.json file and assign them to variables in this class.
 	 */
-	public void setVariables() {
+	public boolean setVariables() {
 		Charset cs = Charset.forName("ISO-8859-1");
 		Path path = Paths.get("config.json");
 		Config config = new Config();
@@ -106,7 +115,8 @@ public class Config {
 			Gson gson = new Gson();
 			while((line = reader.readLine()) != null) {
 				try {
-					config = gson.fromJson(line, Config.class); // parse filenames from config file to config object
+					config = gson.fromJson(line, Config.class); // parse variables from config.json file to config object
+					this.brokerType = config.brokerType;
 					this.inputFileName1 = config.inputFileName1;
 					this.inputFileName2 = config.inputFileName2;
 					this.outputFileName1 = config.outputFileName1;
@@ -122,6 +132,8 @@ public class Config {
 		}
 		catch(IOException ioe) {
 			System.out.println("Please try again with correct config file.");
+			return false;
 		}
+		return true;
 	}
 }

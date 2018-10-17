@@ -3,7 +3,6 @@ package cs601.project2;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 
@@ -28,6 +27,9 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 		this.pool = Executors.newFixedThreadPool(nThreads);
 	}
 	
+	/**
+	 * Uses thread pool to handle sending the published review items to registered subscribers.
+	 */
 	@Override
 	public void publish(Review review) {
 		for(Subscriber<Review> subscriber: subscribers) {
@@ -35,11 +37,18 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 		}
 	}
 	
+	/**
+	 * Subscribe method for subscribers to receive future published items.
+	 * Adds subscriber to a list.
+	 */
 	@Override
 	public void subscribe(Subscriber<Review> subscriber) {
 		subscribers.add(subscriber);
 	}
 	
+	/**
+	 * Shutdown thread pool.
+	 */
 	@Override
 	public void shutdown() {
 		pool.shutdown();
@@ -47,5 +56,4 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 			
 		}
 	}
-
 }

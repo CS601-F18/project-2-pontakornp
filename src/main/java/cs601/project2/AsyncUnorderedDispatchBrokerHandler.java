@@ -17,6 +17,9 @@ public class AsyncUnorderedDispatchBrokerHandler implements Runnable {
 		this.review = review;
 	}
 	
+	/**
+	 * Run thread to send items to registered subscribers.
+	 */
 	@Override
 	public void run() {
 		subscriber.onEvent(review);

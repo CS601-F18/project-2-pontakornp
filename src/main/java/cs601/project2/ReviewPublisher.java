@@ -50,7 +50,7 @@ public class ReviewPublisher implements Runnable{
 				}
 			}
 			catch(IOException ioe) {
-				System.out.println("Please try again with correct input.");
+				System.out.println("Please try again with correct input files.");
 			}
 			running = false;
 		}

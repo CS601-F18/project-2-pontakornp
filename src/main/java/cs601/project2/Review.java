@@ -32,7 +32,12 @@ public class Review{
 	public String toString() {
 		return "Reviewer ID: " + reviewerID + "\n"
 				+ "ASIN: " + asin + "\n"
+				+ "Reviewer name: " + reviewerName + "\n"
+				+ "Helpful: " + helpful[0] + ", " + helpful[1] + "\n"
 				+ "Review text: " + reviewText + "\n"
-				+ "Overall score: " + overall + "\n";
+				+ "Overall score: " + overall + "\n"
+				+ "Summary: " + summary + "\n"
+				+ "Unix review time: " + unixReviewTime + "\n"
+				+ "Review time: " + reviewTime;		
 	}
 }

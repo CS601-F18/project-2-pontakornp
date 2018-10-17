@@ -89,7 +89,7 @@ public class ReviewBlockingQueue {
 	 * 
 	 * Works similarly to take method but with a timeout
 	 * 
-	 * 3 scenario that could happens when calling poll method.
+	 * 3 scenarios that can happen when calling poll method:
 	 * 1. When queue has an item, return the item
 	 * 2. When queue is empty, but the timeout has not reached, wait for item to be added in the queue
 	 * 3. When queue is empty, but the timeout has expired, return null
@@ -101,7 +101,7 @@ public class ReviewBlockingQueue {
 			try {
 				this.wait(timeout);
 			} catch (InterruptedException e) {
-				System.out.println("wait fail");
+				System.out.println("Please try again.");
 			}
 			pollEnd = System.currentTimeMillis();
 			if((pollEnd - pollStart) >= timeout) {

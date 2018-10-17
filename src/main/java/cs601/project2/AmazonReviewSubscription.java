@@ -14,46 +14,51 @@ import java.io.IOException;
  * 
  * Only the broker knows who the publisher or subscriber is, but publisher and subscriber do not know each other.
  * Implements 2 publisher and 2 subscribers according to project specifications.
- *
+ * 
+ * There are fields that must be specified in config.json file:
+ * 1. brokerType - SyncOrdered, AsyncOrderd, or AsyncUnordered. SyncOrdered is set as default type.
+ * 2. input/ output filenames - 2 input and 2 output filenames.
+ * 3. blockingQueueSize - size of blocking queue used in AsyncOrdered
+ * 4. pollTimeout - timeout of poll method of blocking queue class used in AsyncOrdered
+ * 5. nThreads - number of Threads used in AsyncUnordered
+ * 
  */
 public class AmazonReviewSubscription {
-
 	public static void main(String[] args) throws IOException{
-		
+		// instantiates config
 		Config config = new Config();
-		config.setVariables();
+		if(!config.setVariables()) {
+			return;
+		}
+		String brokerType = config.getBrokerType();
 		String inputFileName1 = config.getInputFileName1();
 		String inputFileName2 = config.getInputFileName2();
 		String outputFileName1 = config.getOutputFileName1();
 		String outputFileName2 = config.getOutputFileName2();
-//		String outputFileName1 = "new_reviews2.json";
-//		String outputFileName2 = "old_reviews2.json";
-//		String inputFileName1 = "home_kitchen_sample.json";
-//		String inputFileName2 = "app_android_sample.json";
-		
 		long separatedUnixReviewTime = config.getSeparatedUnixReviewTime();
 		int blockingQueueSize = config.getBlockingQueueSize();
 		int pollTimeout = config.getPollTimeout();
 		int nThreads = config.getNThreads();
-		
 		// instantiates broker
-//		SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker();
-//		AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker(blockingQueueSize, pollTimeout);
-		AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker(nThreads);
-		
+		Broker<Review> broker;
+		if(brokerType.equals("AsyncOrdered")) {
+			broker = new AsyncOrderedDispatchBroker(blockingQueueSize, pollTimeout);
+		} else if(brokerType.equals("AsyncUnordered")) {
+			broker = new AsyncUnorderedDispatchBroker(nThreads);
+		} else {
+			brokerType = "SyncOrdered";
+			broker = new SynchronousOrderedDispatchBroker();
+		}
 		// instantiates publishers and subscribers
 		ReviewPublisher p1 = new ReviewPublisher(broker, inputFileName1);
 		ReviewPublisher p2 = new ReviewPublisher(broker, inputFileName2);
-		ReviewSubscriber s1 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName1, "new");
-		ReviewSubscriber s2 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName2, "old");
-		
-		// subscribers subscribe to broker
+		ReviewSubscriber s1 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName1);
+		ReviewSubscriber s2 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName2);
+		// subscribers subscribe
 		broker.subscribe(s1);
 		broker.subscribe(s2);
-		
-		// start timer
+		// starts timer
 		long start = System.currentTimeMillis();
-		
 		// run publishers threads
 		Thread publisherThread1 = new Thread(p1);
 		Thread publisherThread2 = new Thread(p2);
@@ -68,13 +73,9 @@ public class AmazonReviewSubscription {
 		} catch (InterruptedException e) {
 			System.out.println("Please try again.");
 		}
-		
-		// stop timer
+		// stops timer
 		long end = System.currentTimeMillis();
-		
-		System.out.println("Time: " + Math.round((end-start) / 1000) + " seconds" );
-		System.out.println("Time: " + (end-start) + " miliseconds" );
-		System.out.println("Done");
+		System.out.println("Broker Type: " + brokerType);
+		System.out.println("Runtime: " + (end-start) + " milliseconds" );
 	}
-
 }
