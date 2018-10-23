@@ -30,52 +30,31 @@ public class AmazonReviewSubscription {
 		if(!config.setVariables()) {
 			return;
 		}
-		String brokerType = config.getBrokerType();
-		String inputFileName1 = config.getInputFileName1();
-		String inputFileName2 = config.getInputFileName2();
-		String outputFileName1 = config.getOutputFileName1();
-		String outputFileName2 = config.getOutputFileName2();
+		AmazonReviewSubscriptionHelper helper = new AmazonReviewSubscriptionHelper(config);
 		long separatedUnixReviewTime = config.getSeparatedUnixReviewTime();
-		int blockingQueueSize = config.getBlockingQueueSize();
-		int pollTimeout = config.getPollTimeout();
-		int nThreads = config.getNThreads();
 		// instantiates broker
-		Broker<Review> broker;
-		if(brokerType.equals("AsyncOrdered")) {
-			broker = new AsyncOrderedDispatchBroker(blockingQueueSize, pollTimeout);
-		} else if(brokerType.equals("AsyncUnordered")) {
-			broker = new AsyncUnorderedDispatchBroker(nThreads);
-		} else {
-			brokerType = "SyncOrdered";
-			broker = new SynchronousOrderedDispatchBroker();
-		}
+		Broker<Review> broker = helper.instantiatesBroker();
 		// instantiates publishers and subscribers
-		ReviewPublisher p1 = new ReviewPublisher(broker, inputFileName1);
-		ReviewPublisher p2 = new ReviewPublisher(broker, inputFileName2);
-		ReviewSubscriber s1 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName1);
-		ReviewSubscriber s2 = new ReviewSubscriber(separatedUnixReviewTime, outputFileName2);
+		ReviewPublisher p1 = new ReviewPublisher(broker, config.getInputFileName1());
+		ReviewPublisher p2 = new ReviewPublisher(broker, config.getInputFileName2());
+		ReviewSubscriber s1 = new ReviewSubscriber(separatedUnixReviewTime, config.getOutputFileName1());
+		ReviewSubscriber s2 = new ReviewSubscriber(separatedUnixReviewTime, config.getOutputFileName2());
 		// subscribers subscribe
 		broker.subscribe(s1);
 		broker.subscribe(s2);
 		// starts timer
 		long start = System.currentTimeMillis();
 		// run publishers threads
-		Thread publisherThread1 = new Thread(p1);
-		Thread publisherThread2 = new Thread(p2);
-		publisherThread1.start();
-		publisherThread2.start();
-		try {
-			publisherThread1.join();
-			publisherThread2.join();
-			broker.shutdown();
-			s1.shutdown();
-			s2.shutdown();
-		} catch (InterruptedException e) {
-			System.out.println("Please try again.");
+		boolean areThreadsFinishRunning = helper.runPublisherThreads(p1, p2);
+		if(!areThreadsFinishRunning) {
+			return;
 		}
+		broker.shutdown();
+		s1.shutdown();
+		s2.shutdown();
 		// stops timer
 		long end = System.currentTimeMillis();
-		System.out.println("Broker Type: " + brokerType);
+		System.out.println("Broker Type: " + config.getBrokerType());
 		System.out.println("Runtime: " + (end-start) + " milliseconds" );
 	}
 }
