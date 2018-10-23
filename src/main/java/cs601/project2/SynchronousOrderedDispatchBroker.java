@@ -1,6 +1,6 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 
@@ -14,10 +14,10 @@ import java.util.ArrayList;
  *
  */
 public class SynchronousOrderedDispatchBroker implements Broker<Review> {
-	private ArrayList<Subscriber<Review>> subscribers;
+	private CopyOnWriteArrayList<Subscriber<Review>> subscribers;
 	
 	public SynchronousOrderedDispatchBroker() {
-		this.subscribers = new ArrayList<Subscriber<Review>>();
+		this.subscribers = new CopyOnWriteArrayList<Subscriber<Review>>();
 	}
 	
 	/**

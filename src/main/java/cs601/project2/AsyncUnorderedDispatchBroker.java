@@ -1,6 +1,6 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,11 +19,11 @@ import java.util.concurrent.Executors;
  * 
  */
 public class AsyncUnorderedDispatchBroker implements Broker<Review> {
-	private ArrayList<Subscriber<Review>> subscribers;
+	private CopyOnWriteArrayList<Subscriber<Review>> subscribers;
 	private ExecutorService pool;
 	
 	public AsyncUnorderedDispatchBroker(int nThreads) {
-		this.subscribers = new ArrayList<Subscriber<Review>>();
+		this.subscribers = new CopyOnWriteArrayList<Subscriber<Review>>();
 		this.pool = Executors.newFixedThreadPool(nThreads);
 	}
 	

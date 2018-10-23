@@ -1,6 +1,6 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 
@@ -11,12 +11,12 @@ import java.util.ArrayList;
  *
  */
 public class AsyncOrderedDispatchBrokerHandler implements Runnable{
-	private ArrayList<Subscriber<Review>> subscribers;
+	private CopyOnWriteArrayList<Subscriber<Review>> subscribers;
 	private ReviewBlockingQueue rbq;
 	private int pollTimeout;
 	private boolean running;
 	
-	public AsyncOrderedDispatchBrokerHandler(ArrayList<Subscriber<Review>> subscribers, ReviewBlockingQueue rbq, int pollTimeout) {
+	public AsyncOrderedDispatchBrokerHandler(CopyOnWriteArrayList<Subscriber<Review>> subscribers, ReviewBlockingQueue rbq, int pollTimeout) {
 		this.subscribers = subscribers;
 		this.rbq = rbq;
 		this.pollTimeout = pollTimeout;

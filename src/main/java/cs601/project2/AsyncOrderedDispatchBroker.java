@@ -1,6 +1,6 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 
@@ -18,13 +18,13 @@ import java.util.ArrayList;
  *
  */
 public class AsyncOrderedDispatchBroker implements Broker<Review>{
-	private ArrayList<Subscriber<Review>> subscribers;
+	private CopyOnWriteArrayList<Subscriber<Review>> subscribers;
 	private ReviewBlockingQueue rbq;
 	private AsyncOrderedDispatchBrokerHandler handler;
 	private Thread handlerThread;
 	
 	public AsyncOrderedDispatchBroker(int blockingQueueSize, int pollTimeout) {
-		this.subscribers = new ArrayList<Subscriber<Review>>();
+		this.subscribers = new CopyOnWriteArrayList<Subscriber<Review>>();
 		this.rbq = new ReviewBlockingQueue(blockingQueueSize);
 		this.handler = new AsyncOrderedDispatchBrokerHandler(subscribers, rbq, pollTimeout);
 		this.handlerThread = new Thread(handler);
