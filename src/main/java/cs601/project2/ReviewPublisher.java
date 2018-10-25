@@ -19,14 +19,16 @@ import com.google.gson.JsonSyntaxException;
  * Works as a thread to send review items to broker to be sent to current subscribers
  * 
  */
-public class ReviewPublisher implements Runnable{
-	private Broker<Review> broker;
+public class ReviewPublisher<T> implements Runnable{
+	private Broker<T> broker;
+	private Class<T> type;
 	private boolean running;
 	private Charset cs;
 	private Path path;
 	
-	public ReviewPublisher(Broker<Review> broker, String fileName) {
+	public ReviewPublisher(Broker<T> broker, Class<T> type, String fileName) {
 		this.broker = broker;
+		this.type = type;
 		this.running = true;
 		this.cs = Charset.forName("ISO-8859-1");
 		this.path = Paths.get(fileName);
@@ -42,8 +44,8 @@ public class ReviewPublisher implements Runnable{
 				Gson gson = new Gson();
 				while((line = reader.readLine()) != null) {
 					try {
-						Review review = gson.fromJson(line, Review.class); // parse json to Review object
-						broker.publish(review);
+						T item = gson.fromJson(line, type); // parse json to Review object
+						broker.publish(item);
 					} catch(JsonSyntaxException jse) {
 						// skip
 					}

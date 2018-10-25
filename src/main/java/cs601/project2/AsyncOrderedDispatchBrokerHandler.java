@@ -1,6 +1,6 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 
@@ -10,13 +10,13 @@ import java.util.ArrayList;
  * Is a thread that take (poll method) item and the blocking queue and send it to subscribers if available.
  *
  */
-public class AsyncOrderedDispatchBrokerHandler implements Runnable{
-	private ArrayList<Subscriber<Review>> subscribers;
-	private ReviewBlockingQueue rbq;
+public class AsyncOrderedDispatchBrokerHandler<T> implements Runnable{
+	private CopyOnWriteArrayList<Subscriber<T>> subscribers;
+	private CS601BlockingQueue<T> rbq;
 	private int pollTimeout;
 	private boolean running;
 	
-	public AsyncOrderedDispatchBrokerHandler(ArrayList<Subscriber<Review>> subscribers, ReviewBlockingQueue rbq, int pollTimeout) {
+	public AsyncOrderedDispatchBrokerHandler(CopyOnWriteArrayList<Subscriber<T>> subscribers, CS601BlockingQueue<T> rbq, int pollTimeout) {
 		this.subscribers = subscribers;
 		this.rbq = rbq;
 		this.pollTimeout = pollTimeout;
@@ -30,12 +30,24 @@ public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 	@Override
 	public void run() {
 		while(running) {
-			Review review = rbq.poll(pollTimeout); // Calls poll method of blocking queue to get review item or null if timeout has reached.
-			// If review has value, send review item to registered subscribers.
-			if(review != null) {
-				for(Subscriber<Review> subscriber: subscribers) {
-					subscriber.onEvent(review);
-				}
+			sendItemToSubscriber();
+		}
+		// if there is any left over item in the queue that is not send to subscribers, send those items to subscribers
+		while(!rbq.isEmpty()) {
+			sendItemToSubscriber();
+		}
+		
+	}
+	
+	/**
+	 * Send items to registered subscribers
+	 */
+	public void sendItemToSubscriber() {
+		T item = rbq.poll(pollTimeout); // Calls poll method of blocking queue to get review item or null if timeout has reached.
+		// If review has value, send item to registered subscribers.
+		if(item != null) {
+			for(Subscriber<T> subscriber: subscribers) {
+				subscriber.onEvent(item);
 			}
 		}
 	}
@@ -44,9 +56,6 @@ public class AsyncOrderedDispatchBrokerHandler implements Runnable{
 	 * Changes running value to false if the blocking queue is empty.
 	 */
 	public void shutdown() {
-		while(!rbq.isEmpty()) {
-			
-		}
 		running = false;
 	}
 }

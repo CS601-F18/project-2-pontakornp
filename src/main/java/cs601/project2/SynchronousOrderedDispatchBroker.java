@@ -1,6 +1,6 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 
@@ -13,20 +13,20 @@ import java.util.ArrayList;
  * Items are sent to each subscribers in the same order.
  *
  */
-public class SynchronousOrderedDispatchBroker implements Broker<Review> {
-	private ArrayList<Subscriber<Review>> subscribers;
+public class SynchronousOrderedDispatchBroker<T> implements Broker<T> {
+	private CopyOnWriteArrayList<Subscriber<T>> subscribers;
 	
 	public SynchronousOrderedDispatchBroker() {
-		this.subscribers = new ArrayList<Subscriber<Review>>();
+		this.subscribers = new CopyOnWriteArrayList<Subscriber<T>>();
 	}
 	
 	/**
 	 * Publisher to publishes review items to registered subscribers.
 	 */
 	@Override
-	public synchronized void publish(Review review) {
-		for(Subscriber<Review> subscriber: subscribers) {
-			subscriber.onEvent(review);
+	public synchronized void publish(T item) {
+		for(Subscriber<T> subscriber: subscribers) {
+			subscriber.onEvent(item);
 		}
 	}
 
@@ -34,7 +34,7 @@ public class SynchronousOrderedDispatchBroker implements Broker<Review> {
 	 * Subscribers to subscribes to receive published items.
 	 */
 	@Override
-	public void subscribe(Subscriber<Review> subscriber) {
+	public void subscribe(Subscriber<T> subscriber) {
 		subscribers.add(subscriber);
 	}
 

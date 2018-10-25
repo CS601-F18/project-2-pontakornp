@@ -1,8 +1,9 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 
@@ -18,12 +19,12 @@ import java.util.concurrent.Executors;
  * Uses thread pool to help in sending review items to subscribers
  * 
  */
-public class AsyncUnorderedDispatchBroker implements Broker<Review> {
-	private ArrayList<Subscriber<Review>> subscribers;
+public class AsyncUnorderedDispatchBroker<T> implements Broker<T> {
+	private CopyOnWriteArrayList<Subscriber<T>> subscribers;
 	private ExecutorService pool;
 	
 	public AsyncUnorderedDispatchBroker(int nThreads) {
-		this.subscribers = new ArrayList<Subscriber<Review>>();
+		this.subscribers = new CopyOnWriteArrayList<Subscriber<T>>();
 		this.pool = Executors.newFixedThreadPool(nThreads);
 	}
 	
@@ -31,9 +32,9 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 	 * Uses thread pool to handle sending the published review items to registered subscribers.
 	 */
 	@Override
-	public void publish(Review review) {
-		for(Subscriber<Review> subscriber: subscribers) {
-			pool.execute(new AsyncUnorderedDispatchBrokerHandler(subscriber, review));
+	public void publish(T item) {
+		for(Subscriber<T> subscriber: subscribers) {
+			pool.execute(new AsyncUnorderedDispatchBrokerHandler<T>(subscriber, item));
 		}
 	}
 	
@@ -42,18 +43,27 @@ public class AsyncUnorderedDispatchBroker implements Broker<Review> {
 	 * Adds subscriber to a list.
 	 */
 	@Override
-	public void subscribe(Subscriber<Review> subscriber) {
+	public void subscribe(Subscriber<T> subscriber) {
 		subscribers.add(subscriber);
 	}
 	
 	/**
 	 * Shutdown thread pool.
+	 * reference: https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html#awaitTermination-long-java.util.concurrent.TimeUnit-
 	 */
 	@Override
 	public void shutdown() {
 		pool.shutdown();
-		while(!pool.isTerminated()) {
-			
+		try {
+			// Wait a while for existing tasks to terminate
+		     if (!pool.awaitTermination(60, TimeUnit.MILLISECONDS)) {
+		    	 pool.shutdownNow(); // Cancel currently executing tasks
+		     // Wait a while for tasks to respond to being cancelled
+	    	 if (!pool.awaitTermination(60, TimeUnit.MILLISECONDS))
+	    		 System.err.println("Pool did not terminate, please try again.");
+		     }
+		} catch (InterruptedException e) {
+			System.out.println("Pool did not terminate properly, please try again.");
 		}
 	}
 }

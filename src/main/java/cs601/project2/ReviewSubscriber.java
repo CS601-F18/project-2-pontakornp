@@ -17,7 +17,7 @@ import com.google.gson.Gson;
  * Contains method onEvent that write items to file and shutdown to close the buffered writer.
  *
  */
-public class ReviewSubscriber implements Subscriber<Review> {
+public class ReviewSubscriber<T> implements Subscriber<T> {
 	private long separatedUnixReviewTime;
 	private String fileName;
 	private Charset cs;
@@ -47,7 +47,8 @@ public class ReviewSubscriber implements Subscriber<Review> {
 	 * Writes review items by separating them into two files by unix review time specified in the config file.
 	 */
 	@Override
-	public void onEvent(Review review) {
+	public void onEvent(T item) {
+		Review review = (Review) item;
 		String reviewRecord = gson.toJson(review);
 		if((review.getUnixReviewTime() > separatedUnixReviewTime && fileName.equals(outputFileName1)) || 
 			(review.getUnixReviewTime() <= separatedUnixReviewTime && fileName.equals(outputFileName2))) {

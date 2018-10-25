@@ -1,6 +1,6 @@
 package cs601.project2;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 
@@ -17,16 +17,16 @@ import java.util.ArrayList;
  * Uses helper class, AsyncOrderedDispatchBrokerHandler, as a thread to take the item from the queue and send to subscriber.
  *
  */
-public class AsyncOrderedDispatchBroker implements Broker<Review>{
-	private ArrayList<Subscriber<Review>> subscribers;
-	private ReviewBlockingQueue rbq;
-	private AsyncOrderedDispatchBrokerHandler handler;
+public class AsyncOrderedDispatchBroker<T> implements Broker<T>{
+	private CopyOnWriteArrayList<Subscriber<T>> subscribers;
+	private CS601BlockingQueue<T> rbq;
+	private AsyncOrderedDispatchBrokerHandler<T> handler;
 	private Thread handlerThread;
 	
 	public AsyncOrderedDispatchBroker(int blockingQueueSize, int pollTimeout) {
-		this.subscribers = new ArrayList<Subscriber<Review>>();
-		this.rbq = new ReviewBlockingQueue(blockingQueueSize);
-		this.handler = new AsyncOrderedDispatchBrokerHandler(subscribers, rbq, pollTimeout);
+		this.subscribers = new CopyOnWriteArrayList<Subscriber<T>>();
+		this.rbq = new CS601BlockingQueue<T>(blockingQueueSize);
+		this.handler = new AsyncOrderedDispatchBrokerHandler<T>(subscribers, rbq, pollTimeout);
 		this.handlerThread = new Thread(handler);
 		handlerThread.start();
 	}
@@ -36,8 +36,8 @@ public class AsyncOrderedDispatchBroker implements Broker<Review>{
 	 * Puts review item in the queue.
 	 */
 	@Override
-	public void publish(Review review) {
-		rbq.put(review);
+	public void publish(T item) {
+		rbq.put(item);
 	}
 	
 	/**
@@ -45,7 +45,7 @@ public class AsyncOrderedDispatchBroker implements Broker<Review>{
 	 * Adds subscriber to a list.
 	 */
 	@Override
-	public void subscribe(Subscriber<Review> subscriber) {
+	public void subscribe(Subscriber<T> subscriber) {
 		subscribers.add(subscriber);
 	}
 	

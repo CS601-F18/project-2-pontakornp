@@ -8,13 +8,13 @@ package cs601.project2;
  * Works as a thread to be instantiated in the thread pool to send item to current subscribers.
  *
  */
-public class AsyncUnorderedDispatchBrokerHandler implements Runnable {
-	private Subscriber<Review> subscriber;
-	private Review review;
+public class AsyncUnorderedDispatchBrokerHandler<T> implements Runnable {
+	private Subscriber<T> subscriber;
+	private T item;
 	
-	public AsyncUnorderedDispatchBrokerHandler(Subscriber<Review> subscriber, Review review) {
+	public AsyncUnorderedDispatchBrokerHandler(Subscriber<T> subscriber, T item) {
 		this.subscriber = subscriber;
-		this.review = review;
+		this.item = item;
 	}
 	
 	/**
@@ -22,6 +22,6 @@ public class AsyncUnorderedDispatchBrokerHandler implements Runnable {
 	 */
 	@Override
 	public void run() {
-		subscriber.onEvent(review);
+		subscriber.onEvent(item);
 	}
 }

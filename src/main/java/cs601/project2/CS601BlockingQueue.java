@@ -4,19 +4,19 @@ package cs601.project2;
  * 
  * @author pontakornp
  *
- * Review Blocking Queue has the same logic as the blocking queue in java library.
+ * CS601 Blocking Queue has the same logic as the blocking queue in java library.
  * 
  * Manages the synchronization of putting or taking items from the queue.
  * Also includes poll method that is similar to take method but wit
  */
-public class ReviewBlockingQueue {
-	private Review[] reviews;
+public class CS601BlockingQueue<T> {
+	private T[] items;
 	private int start;
 	private int end;
 	private int size;
 
-	public ReviewBlockingQueue(int size) {
-		this.reviews = new Review[size];
+	public CS601BlockingQueue(int size) {
+		this.items = (T[]) new Object[size];
 		this.start = 0;
 		this.end = -1;
 		this.size = 0;
@@ -29,16 +29,16 @@ public class ReviewBlockingQueue {
 	 * 
 	 * @param review
 	 */
-	public synchronized void put(Review review) {
-		while(size == reviews.length) {
+	public synchronized void put(T item) {
+		while(size == items.length) {
 			try {
 				this.wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}				
-		int next = (end+1)%reviews.length;
-		reviews[next] = review;
+		int next = (end+1)%items.length;
+		items[next] = item;
 		end = next;		
 		size++;
 		if(size == 1) {
@@ -54,7 +54,7 @@ public class ReviewBlockingQueue {
 	 * 
 	 * @return item
 	 */
-	public synchronized Review take() {
+	public synchronized T take() {
 		while(size == 0) {
 			try {
 				this.wait();
@@ -63,13 +63,13 @@ public class ReviewBlockingQueue {
 			}		
 		}
 
-		Review review = reviews[start];
-		start = (start+1)%reviews.length;
+		T item = items[start];
+		start = (start+1)%items.length;
 		size--;
-		if(size == reviews.length-1) {
+		if(size == items.length-1) {
 			this.notifyAll();
 		}
-		return review;
+		return item;
 	}
 
 	/**
@@ -94,14 +94,18 @@ public class ReviewBlockingQueue {
 	 * 2. When queue is empty, but the timeout has not reached, wait for item to be added in the queue
 	 * 3. When queue is empty, but the timeout has expired, return null
 	 */
-	public synchronized Review poll(long timeout) {
+	public synchronized T poll(long timeout) {
 		long pollStart = System.currentTimeMillis();
 		long pollEnd = 0;
 		while(size == 0) {
 			try {
 				this.wait(timeout);
+				
 			} catch (InterruptedException e) {
 				System.out.println("Please try again.");
+			}
+			if(size > 0) {
+				break;
 			}
 			pollEnd = System.currentTimeMillis();
 			if((pollEnd - pollStart) >= timeout) {
@@ -109,12 +113,12 @@ public class ReviewBlockingQueue {
 			}
 			timeout = timeout - (pollEnd - pollStart);
 		}
-		Review review = reviews[start];
-		start = (start+1)%reviews.length;
+		T item = items[start];
+		start = (start+1)%items.length;
 		size--;
-		if(size == reviews.length-1) {
+		if(size == items.length-1) {
 			this.notifyAll();
 		}
-		return review;
+		return item;
 	}
 }
